@@ -2,7 +2,10 @@
 
 A React-based application that extracts information (Name, Role, Phone Number, and Address) from PDF documents using PDF.js and automatically populates form fields. Built with React, TypeScript, and Tailwind CSS.
 
-![PDF Extractor Demo]c:\Users\Syedf\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20250121-0944-40.5377217.mp4
+![PDF Extractor Demo]   
+
+https://github.com/user-attachments/assets/5eceeae7-8189-477f-a68b-7468741492de
+
 
 ## Features
 
