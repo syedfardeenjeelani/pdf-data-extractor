@@ -37,8 +37,7 @@ const PDFExtractor: React.FC = () => {
     const namePattern = /(?:name[:\s]+)([A-Za-z\s]+)/i;
     const phonePattern = /(?:phone|tel|mobile)[:\s]+([0-9+\-\s()]{10,})/i; 
     const addressPattern = /(?:address[:\s]+)([^]*?)(?:\s+Role\b|$)/i;
-
-    // Updated role pattern to be more specific
+ 
     const rolePattern =
       /(?:Role|Position|Title|Designation)[:\s]+([A-Za-z\s]+)/i;
 
@@ -46,13 +45,12 @@ const PDFExtractor: React.FC = () => {
     const phoneMatch = text.match(phonePattern);
     const addressMatch = text.match(addressPattern);
     const roleMatch = text.match(rolePattern);
-
-    // Clean up address by removing extra whitespace and common artifacts
+ 
     const cleanAddress = (addr: string) => {
       return addr
-        .replace(/\s+/g, " ") // Replace multiple spaces with single space
-        .replace(/\bRole\b.*$/i, "") // Remove "Role" and anything after it
-        .replace(/,\s*$/, "") // Remove trailing comma
+        .replace(/\s+/g, " ")  
+        .replace(/\bRole\b.*$/i, "")  
+        .replace(/,\s*$/, "") 
         .trim();
     };
 
@@ -86,7 +84,7 @@ const PDFExtractor: React.FC = () => {
         fullText += pageText + " ";
       }
 
-      setDebugText(fullText); // For debugging purposes
+      setDebugText(fullText); 
       const extractedData = extractInformation(fullText);
       setFormData(extractedData);
     } catch (error) {
