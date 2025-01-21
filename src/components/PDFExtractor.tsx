@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 
-// Define types
 interface FormData {
   name: string;
   phone: string;
@@ -13,14 +12,12 @@ interface FormData {
   role: string;
 }
 
-// Declare PDF.js types
 declare global {
   interface Window {
     "pdfjs-dist/build/pdf": any;
   }
 }
 
-// Initialize PDF.js
 const pdfjsLib = window["pdfjs-dist/build/pdf"];
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
@@ -33,24 +30,36 @@ const PDFExtractor: React.FC = () => {
     role: "",
   });
   const [loading, setLoading] = useState<boolean>(false);
+  const [debugText, setDebugText] = useState<string>("");  
 
   const extractInformation = (text: string): FormData => {
-    // Enhanced regex patterns
+    
     const namePattern = /(?:name[:\s]+)([A-Za-z\s]+)/i;
-    const phonePattern = /(?:phone|tel|mobile)[:\s]+([0-9+\-\s()]{10,})/i;
-    const addressPattern = /(?:address[:\s]+)([A-Za-z0-9\s,.-]+)/i;
+    const phonePattern = /(?:phone|tel|mobile)[:\s]+([0-9+\-\s()]{10,})/i; 
+    const addressPattern = /(?:address[:\s]+)([^]*?)(?:\s+Role\b|$)/i;
+
+    // Updated role pattern to be more specific
     const rolePattern =
-      /(?:role|position|title|designation)[:\s]+([A-Za-z\s]+)/i;
+      /(?:Role|Position|Title|Designation)[:\s]+([A-Za-z\s]+)/i;
 
     const nameMatch = text.match(namePattern);
     const phoneMatch = text.match(phonePattern);
     const addressMatch = text.match(addressPattern);
     const roleMatch = text.match(rolePattern);
 
+    // Clean up address by removing extra whitespace and common artifacts
+    const cleanAddress = (addr: string) => {
+      return addr
+        .replace(/\s+/g, " ") // Replace multiple spaces with single space
+        .replace(/\bRole\b.*$/i, "") // Remove "Role" and anything after it
+        .replace(/,\s*$/, "") // Remove trailing comma
+        .trim();
+    };
+
     return {
       name: nameMatch ? nameMatch[1].trim() : "",
       phone: phoneMatch ? phoneMatch[1].trim() : "",
-      address: addressMatch ? addressMatch[1].trim() : "",
+      address: addressMatch ? cleanAddress(addressMatch[1]) : "",
       role: roleMatch ? roleMatch[1].trim() : "",
     };
   };
@@ -68,7 +77,6 @@ const PDFExtractor: React.FC = () => {
       const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
       let fullText = "";
 
-      // Extract text from all pages
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
@@ -78,7 +86,7 @@ const PDFExtractor: React.FC = () => {
         fullText += pageText + " ";
       }
 
-      // Extract information using regex patterns
+      setDebugText(fullText); // For debugging purposes
       const extractedData = extractInformation(fullText);
       setFormData(extractedData);
     } catch (error) {
