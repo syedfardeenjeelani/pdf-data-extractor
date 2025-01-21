@@ -5,38 +5,60 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 
-// Import PDF.js worker from CDN
+// Define types
+interface FormData {
+  name: string;
+  phone: string;
+  address: string;
+  role: string;
+}
+
+// Declare PDF.js types
+declare global {
+  interface Window {
+    "pdfjs-dist/build/pdf": any;
+  }
+}
+
+// Initialize PDF.js
 const pdfjsLib = window["pdfjs-dist/build/pdf"];
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
 
-const PDFExtractor = () => {
-  const [formData, setFormData] = useState({
+const PDFExtractor: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     phone: "",
     address: "",
+    role: "",
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const extractInformation = (text) => {
-    // Simple regex patterns for demonstration
+  const extractInformation = (text: string): FormData => {
+    // Enhanced regex patterns
     const namePattern = /(?:name[:\s]+)([A-Za-z\s]+)/i;
     const phonePattern = /(?:phone|tel|mobile)[:\s]+([0-9+\-\s()]{10,})/i;
     const addressPattern = /(?:address[:\s]+)([A-Za-z0-9\s,.-]+)/i;
+    const rolePattern =
+      /(?:role|position|title|designation)[:\s]+([A-Za-z\s]+)/i;
 
     const nameMatch = text.match(namePattern);
     const phoneMatch = text.match(phonePattern);
     const addressMatch = text.match(addressPattern);
+    const roleMatch = text.match(rolePattern);
 
     return {
       name: nameMatch ? nameMatch[1].trim() : "",
       phone: phoneMatch ? phoneMatch[1].trim() : "",
       address: addressMatch ? addressMatch[1].trim() : "",
+      role: roleMatch ? roleMatch[1].trim() : "",
     };
   };
 
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     setLoading(true);
@@ -50,7 +72,9 @@ const PDFExtractor = () => {
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        const pageText = textContent.items.map((item) => item.str).join(" ");
+        const pageText = textContent.items
+          .map((item: { str: string }) => item.str)
+          .join(" ");
         fullText += pageText + " ";
       }
 
@@ -64,7 +88,7 @@ const PDFExtractor = () => {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -113,6 +137,17 @@ const PDFExtractor = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   placeholder="Extracted name will appear here"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="role">Role</Label>
+                <Input
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleInputChange}
+                  placeholder="Extracted role will appear here"
                 />
               </div>
 
