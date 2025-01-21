@@ -14,8 +14,7 @@ A React-based application that extracts information (Name, Role, Phone Number, a
   - Addresses
 - ✏️ Editable form fields for manual corrections
 - 💅 Modern UI with Tailwind CSS and shadcn/ui components
-- 📱 Responsive design
-- 🔒 Client-side processing (no server required)
+- 📱 Responsive design 
 
 ## Prerequisites
 
@@ -143,4 +142,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Support
 
-For support, please open an issue in the GitHub repository or contact [your-email@example.com]
+For support, please open an issue in the GitHub repository or contact [syedfardeenjeelani13@gmail.com]
